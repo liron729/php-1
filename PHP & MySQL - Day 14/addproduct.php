@@ -1,6 +1,5 @@
 <?php include("header.php"); ?>
 
-
 <div class="signup">
         
     <form class="form-signin" action="products.php" method="post">
@@ -20,13 +19,10 @@
         <input type="number" id="inputPrice" class="form-control" placeholder="Price" name="price" required autofocus>
 
 
-
         <button class="btn btn-lg btn-primary btn-block" type="submit" name="submit">Add Product</button>
-
 
         <p class="mt-5 mb-3 text-muted">Digital School &copy; 2023</p>
     </form>
 </div>
-
 
 <?php include("footer.php"); ?>
