@@ -1,0 +1,122 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f4f4f4;
+  color: #333;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+}
+
+header {
+  background: #111;
+  color: white;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 24px;
+  color: #ff4b2b;
+  text-decoration: none;
+}
+
+nav a {
+  color: white;
+  margin-left: 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  color: #ff4b2b;
+}
+
+h1, h2, h3 {
+  color: #222;
+}
+
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.product-card {
+  background: #fafafa;
+  padding: 15px;
+  border: 1px solid #ddd;
+  width: calc(33% - 13.33px);
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.product-card img {
+  max-width: 100%;
+  height: 150px;
+  object-fit: contain;
+}
+
+.btn {
+  background: #ff4b2b;
+  color: white;
+  padding: 10px 15px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background: #ff3a1a;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+.review {
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.product-img {
+  max-width: 300px;
+  margin-bottom: 15px;
+}
