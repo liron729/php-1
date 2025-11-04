@@ -1,20 +1,36 @@
 <?php
+session_start(); // FIX: Start session
 include('../../config/db.php');
+include('../../includes/functions.php'); // Required for isAdmin()
 include('../../includes/header.php');
 include('../../includes/navbar.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $name = $_POST['name'];
-  $cat = $_POST['category'];
-  $desc = $_POST['description'];
-  $price = $_POST['price'];
-  $stock = $_POST['stock'];
-  $image = $_POST['image'];
+// FIX: Enforce admin access
+if (!isAdmin()) {
+    header("Location: ../login.php");
+    exit;
+}
 
-  $stmt = $conn->prepare("INSERT INTO products (name,category_id,description,price,stock,image) VALUES (?,?,?,?,?,?)");
-  $stmt->bind_param("sisdis", $name, $cat, $desc, $price, $stock, $image);
-  $stmt->execute();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // FIX: Sanitize and validate inputs
+  $name = trim($_POST['name'] ?? '');
+  $cat = filter_var($_POST['category'] ?? 0, FILTER_VALIDATE_INT); 
+  $desc = trim($_POST['description'] ?? '');
+  $price = filter_var($_POST['price'] ?? 0, FILTER_VALIDATE_FLOAT); 
+  $stock = filter_var($_POST['stock'] ?? 0, FILTER_VALIDATE_INT);
+  $image = trim($_POST['image'] ?? '');
+
+  if ($cat !== false && $price !== false && $stock !== false && !empty($name)) {
+      $stmt = $conn->prepare("INSERT INTO products (name, category_id, description, price, stock, image) VALUES (?, ?, ?, ?, ?, ?)");
+      $stmt->bind_param("sisdis", $name, $cat, $desc, $price, $stock, $image);
+      
+      $stmt->execute();
+      $stmt->close(); 
+  }
+  
+  $conn->close(); 
   header("Location: manage_products.php");
+  exit;
 }
 
 $cats = $conn->query("SELECT * FROM categories");
@@ -24,7 +40,13 @@ $cats = $conn->query("SELECT * FROM categories");
 <form method="POST" style="max-width:500px;">
   <input type="text" name="name" placeholder="Product name" required><br>
   <select name="category">
-    <?php while($c=$cats->fetch_assoc()) echo "<option value='{$c['id']}'>{$c['name']}</option>"; ?>
+    <?php 
+    if ($cats) {
+        // FIX: Sanitize category output
+        while($c=$cats->fetch_assoc()) echo "<option value='" . htmlspecialchars($c['id']) . "'>" . htmlspecialchars($c['name']) . "</option>";
+        $cats->free(); 
+    }
+    ?>
   </select><br>
   <textarea name="description" placeholder="Description"></textarea><br>
   <input type="number" step="0.01" name="price" placeholder="Price" required><br>
@@ -33,4 +55,9 @@ $cats = $conn->query("SELECT * FROM categories");
   <button type="submit">Add Product</button>
 </form>
 </section>
-<?php include('../../includes/footer.php'); ?>
+<?php 
+if ($conn->ping()) {
+    $conn->close();
+}
+include('../../includes/footer.php'); 
+?>

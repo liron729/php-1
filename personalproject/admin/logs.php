@@ -3,8 +3,10 @@ session_start();
 include(__DIR__ . '/../includes/header.php');
 include(__DIR__ . '/../includes/navbar.php');
 include(__DIR__ . '/../config/db.php');
+include(__DIR__ . '/../includes/functions.php'); // Required for isAdmin()
 
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+// FIX: Use isAdmin() function for cleaner check
+if (!isAdmin()) {
     header("Location: ../login.php");
     exit;
 }
@@ -24,7 +26,11 @@ $logs = $conn->query("SELECT * FROM admin_logs ORDER BY created_at DESC LIMIT 50
       </tr>
     </thead>
     <tbody>
-      <?php while ($log = $logs->fetch_assoc()): ?>
+      <?php 
+      // FIX: Check for results and sanitize output
+      if ($logs && $logs->num_rows > 0): 
+          while ($log = $logs->fetch_assoc()): 
+      ?>
       <tr>
         <td><?php echo htmlspecialchars($log['created_at']); ?></td>
         <td><?php echo intval($log['user_id']); ?></td>
@@ -32,8 +38,17 @@ $logs = $conn->query("SELECT * FROM admin_logs ORDER BY created_at DESC LIMIT 50
         <td><?php echo htmlspecialchars($log['details']); ?></td>
       </tr>
       <?php endwhile; ?>
+      <?php 
+      $logs->free(); 
+      else:
+      ?>
+      <tr><td colspan="4">No admin logs found.</td></tr>
+      <?php endif; ?>
     </tbody>
   </table>
 </div>
 
-<?php include(__DIR__ . '/../includes/footer.php'); ?>
+<?php 
+$conn->close(); 
+include(__DIR__ . '/../includes/footer.php'); 
+?>
