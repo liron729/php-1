@@ -63,6 +63,10 @@ $cart = $_SESSION['cart'] ?? [];
       </tr>
       </tbody>
     </table>
+    <form method="POST" action="checkout.php">
+    <button type="submit" class="btn">Checkout</button>
+</form>
+
   <?php endif; ?>
 </div>
 

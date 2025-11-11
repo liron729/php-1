@@ -7,7 +7,7 @@ include('../../includes/navbar.php');
 
 // FIX: Enforce admin access
 if (!isAdmin()) {
-    header("Location: ../login.php");
+    header("Location: ../index.php");
     exit;
 }
 

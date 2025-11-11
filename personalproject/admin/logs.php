@@ -7,7 +7,7 @@ include(__DIR__ . '/../includes/functions.php'); // Required for isAdmin()
 
 // FIX: Use isAdmin() function for cleaner check
 if (!isAdmin()) {
-    header("Location: ../login.php");
+    header("Location: ../index.php");
     exit;
 }
 

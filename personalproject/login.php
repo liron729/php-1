@@ -5,6 +5,9 @@ include(__DIR__ . '/includes/navbar.php');
 include(__DIR__ . '/config/db.php');
 
 $error = '';
+$_SESSION['user_id'] = $user_id;
+$_SESSION['username'] = $username;
+$_SESSION['is_admin'] = ($role === 'admin') ? 1 : 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';

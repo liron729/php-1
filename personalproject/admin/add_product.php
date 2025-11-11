@@ -1,15 +1,32 @@
 <?php
-session_start(); // FIX: Start session
-include('../../config/db.php');
-include('../../includes/functions.php'); // Required for isAdmin()
-include('../../includes/header.php');
-include('../../includes/navbar.php');
+// session_start(); // FIX: Start session
+// include('../../config/db.php');
+// include('../../includes/functions.php'); // Required for isAdmin()
+// include('../../includes/header.php');
+// include('../../includes/navbar.php');
+?>
 
-// FIX: Enforce admin access
+<?php
+session_start();
+
+// Correct include paths (only one level up)
+include(__DIR__ . '/../config/db.php');
+include(__DIR__ . '/../includes/functions.php');
+include(__DIR__ . '/../includes/header.php');
+include(__DIR__ . '/../includes/navbar.php');
+
+// Check admin access
 if (!isAdmin()) {
-    header("Location: ../login.php");
+    header("Location: ../index.php");
     exit;
 }
+?>
+<?php
+// // FIX: Enforce admin access
+// if (!isAdmin()) {
+//     header("Location: ../login.php");
+//     exit;
+// }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // FIX: Sanitize and validate inputs

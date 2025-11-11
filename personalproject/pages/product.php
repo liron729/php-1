@@ -2,7 +2,9 @@
 include(__DIR__ . '/../includes/header.php');
 include(__DIR__ . '/../includes/navbar.php');
 include(__DIR__ . '/../config/db.php');
-session_start();
+
+
+// session_start();
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: ../index.php");
@@ -40,17 +42,36 @@ if (!$product) {
 
   <h2>Reviews</h2>
   <?php
-  $reviews = $conn->query("SELECT r.rating, r.comment, u.username FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $id ORDER BY r.created_at DESC");
-  if ($reviews->num_rows > 0) {
-      while ($review = $reviews->fetch_assoc()) {
-          echo "<div class='review'>";
-          echo "<strong>" . htmlspecialchars($review['username']) . "</strong> rated: " . intval($review['rating']) . "/5";
-          echo "<p>" . nl2br(htmlspecialchars($review['comment'])) . "</p>";
-          echo "</div>";
-      }
-  } else {
-      echo "<p>No reviews yet.</p>";
-  }
+  // $reviews = $conn->query("SELECT r.rating, r.comment, u.username FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $id ORDER BY r.created_at DESC");
+  // if ($reviews->num_rows > 0) {
+  //     while ($review = $reviews->fetch_assoc()) {
+  //         echo "<div class='review'>";
+  //         echo "<strong>" . htmlspecialchars($review['username']) . "</strong> rated: " . intval($review['rating']) . "/5";
+  //         echo "<p>" . nl2br(htmlspecialchars($review['comment'])) . "</p>";
+  //         echo "</div>";
+  //     }
+  // } else {
+  //     echo "<p>No reviews yet.</p>";
+  // }
+
+  $reviews = null;
+
+$stmt = $conn->prepare("SELECT * FROM reviews WHERE product_id = ?");
+if ($stmt) {
+    $stmt->bind_param("i", $product_id);
+    if ($stmt->execute()) {
+        $reviews = $stmt->get_result();
+    }
+}
+
+if ($reviews && $reviews->num_rows > 0) {
+    while ($row = $reviews->fetch_assoc()) {
+        echo $row['comment'];
+    }
+} else {
+    echo "No reviews yet.";
+}
+
   ?>
 
   <?php if(isset($_SESSION['user_id'])): ?>

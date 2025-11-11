@@ -1,22 +1,25 @@
-<?php
-include(__DIR__ . '/../config/config.php');
-session_start();
-?>
-<header>
-  <div class="container">
-    <a href="<?php echo $basePath; ?>/index.php" class="logo">AudiVerse</a>
-    <nav>
-      <a href="<?php echo $basePath; ?>/index.php">Home</a>
-      <a href="<?php echo $basePath; ?>/pages/about.php">About</a>
-      <a href="<?php echo $basePath; ?>/pages/contact.php">Contact</a>
-      <a href="<?php echo $basePath; ?>/pages/cart.php">Cart</a>
-      <a href="<?php echo $basePath; ?>/pages/wishlist.php">Wishlist</a>
-      <?php if(isset($_SESSION['user_id'])): ?>
-        <a href="<?php echo $basePath; ?>/logout.php">Logout</a>
-      <?php else: ?>
-        <a href="<?php echo $basePath; ?>/login.php">Login</a>
-        <a href="<?php echo $basePath; ?>/register.php">Register</a>
-      <?php endif; ?>
-    </nav>
-  </div>
-</header>
+
+<nav>
+  <ul>
+    <li><a href="index.php">Home</a></li>
+    <li><a href="products.php">Products</a></li>
+    <li><a href="about.php">About</a></li>
+
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <li><a href="cart.php">Cart</a></li>
+        <li><a href="wishlist.php">Wishlist</a></li>
+
+        <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+            <!-- Admin-only links -->
+            <li><a href="../admin/add_product.php">Add Product</a></li>
+            <li><a href="../admin/manage_orders.php">Manage Orders</a></li>
+            <li><a href="../admin/manage_users.php">Manage Users</a></li>
+        <?php endif; ?>
+
+        <li><a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['username']); ?>)</a></li>
+    <?php else: ?>
+        <li><a href="login.php">Login</a></li>
+        <li><a href="register.php">Register</a></li>
+    <?php endif; ?>
+  </ul>
+</nav>
