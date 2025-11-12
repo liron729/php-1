@@ -70,7 +70,7 @@ footer a:hover {
         <a href="/php-1/personalproject/pages/terms.php">Terms of Service</a> |
         <a href="/php-1/personalproject/pages/contact.php">Contact</a>
         <?php if (isset($_SESSION['user_id'])): ?>
-            | <a href="/php-1/personalproject/pages/cart.php">Cart</a>
+            | <a href="/php-1/personalproject/cart.php">Cart</a>
             | <a href="/php-1/personalproject/pages/wishlist.php">Wishlist</a>
         <?php endif; ?>
         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
