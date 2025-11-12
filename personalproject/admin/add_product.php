@@ -1,80 +1,72 @@
 <?php
-// session_start(); // FIX: Start session
-// include('../../config/db.php');
-// include('../../includes/functions.php'); // Required for isAdmin()
-// include('../../includes/header.php');
-// include('../../includes/navbar.php');
-?>
-
-<?php
 session_start();
-
-// Correct include paths (only one level up)
 include(__DIR__ . '/../config/db.php');
-include(__DIR__ . '/../includes/functions.php');
 include(__DIR__ . '/../includes/header.php');
 include(__DIR__ . '/../includes/navbar.php');
 
-// Check admin access
-if (!isAdmin()) {
-    header("Location: ../index.php");
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    echo "<div class='container'><h2>Access denied</h2></div>";
     exit;
 }
-?>
-<?php
-// // FIX: Enforce admin access
-// if (!isAdmin()) {
-//     header("Location: ../login.php");
-//     exit;
-// }
+
+$success = $error = '';
+
+$cat_result = $conn->query("SELECT * FROM categories ORDER BY name ASC");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // FIX: Sanitize and validate inputs
-  $name = trim($_POST['name'] ?? '');
-  $cat = filter_var($_POST['category'] ?? 0, FILTER_VALIDATE_INT); 
-  $desc = trim($_POST['description'] ?? '');
-  $price = filter_var($_POST['price'] ?? 0, FILTER_VALIDATE_FLOAT); 
-  $stock = filter_var($_POST['stock'] ?? 0, FILTER_VALIDATE_INT);
-  $image = trim($_POST['image'] ?? '');
+    $name = $_POST['name'] ?? '';
+    $price = $_POST['price'] ?? '';
+    $image = $_POST['image'] ?? '';
+    $category_id = $_POST['category_id'] ?? null;
 
-  if ($cat !== false && $price !== false && $stock !== false && !empty($name)) {
-      $stmt = $conn->prepare("INSERT INTO products (name, category_id, description, price, stock, image) VALUES (?, ?, ?, ?, ?, ?)");
-      $stmt->bind_param("sisdis", $name, $cat, $desc, $price, $stock, $image);
-      
-      $stmt->execute();
-      $stmt->close(); 
-  }
-  
-  $conn->close(); 
-  header("Location: manage_products.php");
-  exit;
-}
+    if (!$category_id) {
+        $error = "Please select a category!";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO products (name, price, image, category_id) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sdsi", $name, $price, $image, $category_id);
 
-$cats = $conn->query("SELECT * FROM categories");
-?>
-<section class="admin">
-<h2>Add New Product</h2>
-<form method="POST" style="max-width:500px;">
-  <input type="text" name="name" placeholder="Product name" required><br>
-  <select name="category">
-    <?php 
-    if ($cats) {
-        // FIX: Sanitize category output
-        while($c=$cats->fetch_assoc()) echo "<option value='" . htmlspecialchars($c['id']) . "'>" . htmlspecialchars($c['name']) . "</option>";
-        $cats->free(); 
+        if ($stmt->execute()) {
+            $success = "Product '$name' added successfully!";
+        } else {
+            $error = "Error adding product: " . $conn->error;
+        }
+
+        $stmt->close();
     }
-    ?>
-  </select><br>
-  <textarea name="description" placeholder="Description"></textarea><br>
-  <input type="number" step="0.01" name="price" placeholder="Price" required><br>
-  <input type="number" name="stock" placeholder="Stock" required><br>
-  <input type="text" name="image" placeholder="Image filename (e.g. rs6_exhaust.jpg)"><br>
-  <button type="submit">Add Product</button>
-</form>
-</section>
-<?php 
-if ($conn->ping()) {
-    $conn->close();
 }
-include('../../includes/footer.php'); 
 ?>
+
+<div class="container">
+    <h1>Add Product</h1>
+
+    <?php if ($success): ?>
+        <p class="success"><?php echo htmlspecialchars($success); ?></p>
+    <?php endif; ?>
+
+    <?php if ($error): ?>
+        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+    <?php endif; ?>
+
+    <form method="POST" action="">
+        <label>Name:</label>
+        <input type="text" name="name" required />
+
+        <label>Price:</label>
+        <input type="number" step="0.01" name="price" required />
+
+        <label>Image Filename:</label>
+        <input type="text" name="image" required />
+
+        <label>Category:</label>
+        <select name="category_id" required>
+            <option value="">-- Select Category --</option>
+            <?php while($cat = $cat_result->fetch_assoc()): ?>
+                <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+            <?php endwhile; ?>
+        </select>
+
+        <button type="submit" class="btn">Add Product</button>
+    </form>
+</div>
+
+<?php include(__DIR__ . '/../includes/footer.php'); ?>

@@ -1,4 +1,7 @@
 <?php
-// Base URL for all links/assets - change if you move project folder
-$basePath = '/php-1/personalproject';
+
+$basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$basePath = explode('/php-1', $basePath)[0] . '/php-1/personalproject'; 
+
+
 ?>

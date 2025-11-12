@@ -3,32 +3,28 @@ session_start();
 include(__DIR__ . '/includes/header.php');
 include(__DIR__ . '/includes/navbar.php');
 include(__DIR__ . '/config/db.php');
-
+// log_action($conn, $_SESSION['user_id'], 'Login', 'User logged in successfully');
+// log_action($conn, 0, 'Failed login', 'Invalid credentials for username: ' . $username);
 $error = '';
-$_SESSION['user_id'] = $user_id;
-$_SESSION['username'] = $username;
-$_SESSION['is_admin'] = ($role === 'admin') ? 1 : 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // FIX: Changed SELECT to fetch the correct 'role' column
     $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows === 1) {
-        // FIX: Changed bind_result to use $role
         $stmt->bind_result($user_id, $hashed_password, $role);
         $stmt->fetch();
 
         if (password_verify($password, $hashed_password)) {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
-            // FIX: Set is_admin = 1 if role is 'admin'
-            $_SESSION['is_admin'] = ($role === 'admin') ? 1 : 0; 
+            $_SESSION['is_admin'] = ($role === 'admin') ? 1 : 0;
+
             $stmt->close(); 
             $conn->close();
             header("Location: index.php");
@@ -39,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $error = "Invalid username or password.";
     }
+
     if (isset($stmt)) { $stmt->close(); }
 }
 ?>

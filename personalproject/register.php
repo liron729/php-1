@@ -3,6 +3,7 @@ session_start();
 include(__DIR__ . '/includes/header.php');
 include(__DIR__ . '/includes/navbar.php');
 include(__DIR__ . '/config/db.php');
+// log_action($conn, $new_user_id, 'Register', 'New account created');
 
 $error = '';
 $success = '';
@@ -22,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $password_confirm) {
         $error = "Passwords do not match.";
     } else {
-        // Check if username or email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
         $stmt->bind_param("ss", $username, $email);
         $stmt->execute();
@@ -32,8 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Username or Email already exists.";
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $role = 'user'; // Explicitly set role for new user
-            // FIX: Updated INSERT to include 'email' and 'role'
+            $role = 'user';
             $insert = $conn->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
             $insert->bind_param("ssss", $username, $email, $hashed_password, $role);
             

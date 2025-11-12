@@ -3,52 +3,51 @@ session_start();
 include(__DIR__ . '/../includes/header.php');
 include(__DIR__ . '/../includes/navbar.php');
 include(__DIR__ . '/../config/db.php');
-include(__DIR__ . '/../includes/functions.php'); // Required for isAdmin()
 
-// FIX: Use isAdmin() function for cleaner check
-if (!isAdmin()) {
-    header("Location: ../index.php");
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    echo "<div class='container'><h2>Access Denied</h2></div>";
+    include(__DIR__ . '/../includes/footer.php');
     exit;
 }
 
-$logs = $conn->query("SELECT * FROM admin_logs ORDER BY created_at DESC LIMIT 50");
+$query = "
+    SELECT l.id, u.username, l.action, l.details, l.created_at
+    FROM logs l
+    LEFT JOIN users u ON l.user_id = u.id
+    ORDER BY l.created_at DESC
+";
+$result = $conn->query($query);
 ?>
 
 <div class="container">
-  <h1>Admin Logs</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>User ID</th>
-        <th>Action</th>
-        <th>Details</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php 
-      // FIX: Check for results and sanitize output
-      if ($logs && $logs->num_rows > 0): 
-          while ($log = $logs->fetch_assoc()): 
-      ?>
-      <tr>
-        <td><?php echo htmlspecialchars($log['created_at']); ?></td>
-        <td><?php echo intval($log['user_id']); ?></td>
-        <td><?php echo htmlspecialchars($log['action']); ?></td>
-        <td><?php echo htmlspecialchars($log['details']); ?></td>
-      </tr>
-      <?php endwhile; ?>
-      <?php 
-      $logs->free(); 
-      else:
-      ?>
-      <tr><td colspan="4">No admin logs found.</td></tr>
-      <?php endif; ?>
-    </tbody>
-  </table>
+    <h1>System Logs</h1>
+
+    <?php if ($result->num_rows > 0): ?>
+        <table border="1" cellpadding="10" cellspacing="0" style="width:100%; border-collapse:collapse; margin-top:15px;">
+            <thead style="background:#00b4d8; color:white;">
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($log = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($log['id']); ?></td>
+                        <td><?php echo htmlspecialchars($log['username'] ?? 'Unknown'); ?></td>
+                        <td><?php echo htmlspecialchars($log['action']); ?></td>
+                        <td><?php echo htmlspecialchars($log['details']); ?></td>
+                        <td><?php echo htmlspecialchars($log['created_at']); ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>No logs found.</p>
+    <?php endif; ?>
 </div>
 
-<?php 
-$conn->close(); 
-include(__DIR__ . '/../includes/footer.php'); 
-?>
+<?php include(__DIR__ . '/../includes/footer.php'); ?>

@@ -2,8 +2,9 @@
 // session_start();
 include(__DIR__ . '/../includes/header.php');
 include(__DIR__ . '/../includes/navbar.php');
-include(__DIR__ . '/../config/config.php'); // FIX 1: Include config for $basePath
+include(__DIR__ . '/../config/config.php');
 include(__DIR__ . '/../config/db.php');
+// log_action($conn, $_SESSION['user_id'], 'Wishlist update', 'Modified wishlist for product ID ' . $product_id);
 
 
 
@@ -14,7 +15,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch wishlist products (Query is secure using prepared statements)
 $stmt = $conn->prepare("SELECT p.id, p.name, p.price, p.image FROM wishlist w JOIN products p ON w.product_id = p.id WHERE w.user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -41,8 +41,8 @@ $result = $stmt->get_result();
 </div>
 
 <?php
-$result->free(); // FIX 2: Free the result set
+$result->free();
 $stmt->close();
-$conn->close(); // FIX 3: Close the database connection
+$conn->close();
 include(__DIR__ . '/../includes/footer.php');
 ?>

@@ -1,7 +1,7 @@
 <?php
 include(__DIR__ . '/includes/header.php');
 include(__DIR__ . '/includes/navbar.php');
-include(__DIR__ . '/config/config.php'); // FIX: Include config for $basePath
+include(__DIR__ . '/config/config.php');
 ?>
 <?php
 if (session_status() === PHP_SESSION_NONE) {
@@ -17,7 +17,6 @@ if (session_status() === PHP_SESSION_NONE) {
   $result = $conn->query("SELECT * FROM products LIMIT 6");
   echo "<div class='product-grid'>";
   
-  // FIX: Check if query was successful and has rows
   if ($result && $result->num_rows > 0) {
       while($product = $result->fetch_assoc()) {
           echo "<div class='product-card'>";
@@ -27,13 +26,13 @@ if (session_status() === PHP_SESSION_NONE) {
           echo "<a href='" . htmlspecialchars($basePath) . "/pages/product.php?id=" . htmlspecialchars($product['id']) . "' class='btn'>View Details</a>";
           echo "</div>";
       }
-      $result->free(); // FIX: Free the result set
+      $result->free();
   } else {
       echo "<p>No products found at the moment.</p>";
   }
   
   echo "</div>";
-  $conn->close(); // FIX: Close the database connection
+  $conn->close();
   ?>
 </div>
 

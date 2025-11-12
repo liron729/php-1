@@ -1,65 +1,41 @@
 <?php
-session_start(); // FIX: Start session
-include('../../config/db.php');
-include('../../includes/functions.php'); // FIX: Include functions for auth
-include('../../includes/header.php');
-include('../../includes/navbar.php');
+session_start();
+include(__DIR__ . '/../config/db.php');
+include(__DIR__ . '/../includes/header.php');
+include(__DIR__ . '/../includes/navbar.php');
 
-// FIX: Enforce admin access
-if (!isAdmin()) {
-    header("Location: ../index.php");
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    echo "<div class='container'><h2>Access denied</h2></div>";
     exit;
 }
 
-if (isset($_GET['delete'])) {
-    // FIX: Secured DELETE query using a prepared statement to prevent SQL injection
-    $id = filter_var($_GET['delete'], FILTER_VALIDATE_INT);
-    if ($id !== false && $id > 0) {
-        $delete_stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
-        $delete_stmt->bind_param("i", $id);
-        $delete_stmt->execute();
-        $delete_stmt->close();
-    }
-    // FIX: Redirect to clean URL after action
-    header("Location: manage_products.php");
-    exit;
-}
+$result = $conn->query("SELECT * FROM products ORDER BY id DESC");
+?>
 
-$result = $conn->query("SELECT * FROM products");
-?>
-<section class="admin">
-<h2>Manage Products</h2>
-<a href="add_product.php" class="btn">+ Add New Product</a>
+<div class="container">
+    <h1>Manage Products</h1>
+    <a class="btn" href="add_product.php">+ Add New Product</a>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+        <?php while ($product = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?php echo $product['id']; ?></td>
+                <td><?php echo htmlspecialchars($product['name']); ?></td>
+                <td>$<?php echo number_format($product['price'],2); ?></td>
+                <td><?php echo htmlspecialchars($product['image']); ?></td>
+                <td>
+                    <a class="btn" href="edit_product.php?id=<?php echo $product['id']; ?>">Edit</a>
+                    <a class="btn" href="delete_product.php?id=<?php echo $product['id']; ?>">Delete</a>
+                </td>
+            </tr>
+        <?php endwhile; ?>
+    </table>
+</div>
 
-<table border="1" cellpadding="10" cellspacing="0" style="margin-top:20px;width:90%;background:#fff;">
-<tr>
-<th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Action</th>
-</tr>
-<?php 
-// FIX: Check if query was successful and has rows
-if ($result && $result->num_rows > 0): 
-    while($row = $result->fetch_assoc()): 
-?>
-<tr>
-  <td><?= htmlspecialchars($row['id']) ?></td>
-  <td><?= htmlspecialchars($row['name']) ?></td>
-  <td>$<?= htmlspecialchars(number_format($row['price'], 2)) ?></td>
-  <td><?= htmlspecialchars($row['stock']) ?></td>
-  <td>
-    <a href="edit_product.php?id=<?= htmlspecialchars($row['id']) ?>">Edit</a> |
-    <a href="?delete=<?= htmlspecialchars($row['id']) ?>" onclick="return confirm('Delete this product?')">Delete</a>
-  </td>
-</tr>
-<?php endwhile; ?>
-<?php 
-$result->free(); // FIX: Free result set
-else: 
-?>
-<tr><td colspan="5">No products found.</td></tr>
-<?php endif; ?>
-</table>
-</section>
-<?php 
-$conn->close(); // FIX: Close database connection
-include('../../includes/footer.php'); 
-?>
+<?php include(__DIR__ . '/../includes/footer.php'); ?>
