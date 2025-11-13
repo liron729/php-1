@@ -7,7 +7,9 @@ include(__DIR__ . '/config/config.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 ?>
+
 <div class="container">
   <h1>Welcome to AudiVerse</h1>
   <p>Your one-stop shop for Audi parts.</p>

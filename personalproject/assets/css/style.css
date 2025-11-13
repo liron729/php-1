@@ -205,7 +205,15 @@ h1, h2, h3 {
   background: #fafafa;
   padding: 15px;
   border: 1px solid #ddd;
-  width: calc(33% - 13.33px);
+  width: 400px;
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.product-cardd {
+  background: #fafafa;
+  padding: 15px;
+  border: 1px solid #ddd;
+  width: 500px;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
   text-align: center;
 }
@@ -302,8 +310,10 @@ footer:hover .stripe {
 
 .product-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+
 }
 .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 2px 4px 12px rgba(0,0,0,0.2);
 }
+

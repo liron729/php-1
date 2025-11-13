@@ -29,7 +29,7 @@ $result = $stmt->get_result();
     <?php else: ?>
         <div class="product-grid">
             <?php while ($product = $result->fetch_assoc()): ?>
-                <div class="product-card">
+                <div class="product-cardd">
                     <img src="<?php echo htmlspecialchars($basePath); ?>/assets/images/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" />
                     <h3><?php echo htmlspecialchars($product['name']); ?></h3>
                     <p>$<?php echo number_format($product['price'], 2); ?></p>
